@@ -2,10 +2,10 @@ using Unity.Entities;
 using Unity.Mathematics;
 
 [GenerateAuthoringComponent]
-public struct AsteroidSpawnerComponent : IComponentData
+public struct SpawnerComponent : IComponentData
 {
     //Prefab to spawn
-    public Entity AsteroidPrefab;
+    public Entity SpawnedPrefab;
 
     public float SpawnTimer;
 

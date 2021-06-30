@@ -5,7 +5,7 @@ using Unity.Transforms;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class AsteroidSpawnerSystem : ComponentSystem
+public class SpawnerSystem : ComponentSystem
 {
     private Unity.Mathematics.Random random;
 
@@ -21,16 +21,17 @@ public class AsteroidSpawnerSystem : ComponentSystem
 
         
 
-        Entities.ForEach((ref AsteroidSpawnerComponent spawner) =>
+        Entities.ForEach((ref SpawnerComponent spawner) =>
         {
             spawner.SpawnTimer -= deltaTime;
             if (spawner.SpawnTimer <= 0f)
             {
                 spawner.SpawnTimer = spawner.TimerReset.x + random.NextFloat(0f, 1f) * (spawner.TimerReset.y - spawner.TimerReset.x);
 
-                //Instantiate Asteroid
-                Entity spawnedEntity = EntityManager.Instantiate(spawner.AsteroidPrefab);
+                //Instantiate spawned entity
+                Entity spawnedEntity = EntityManager.Instantiate(spawner.SpawnedPrefab);
 
+                //Position spawned entity and set velocity towards point somewhere in the center of the screen
                 float3 spawnPos = RandomScreenEdgePos();
                 float3 targetPos = RandomScreenEdgePos() * 0.5f; //Requires screen center to be (0,0)
 

@@ -16,6 +16,8 @@ public class CollisionSystem : JobComponentSystem
     private struct CollisionJob : ITriggerEventsJob
     {
         public ComponentDataFromEntity<AsteroidComponent> asteroidGroup;
+        public ComponentDataFromEntity<AlienComponent> alienGroup;
+        public ComponentDataFromEntity<KillPlayerComponent> killPlayerGroup;
         public ComponentDataFromEntity<BulletComponent> bulletGroup;
         public ComponentDataFromEntity<Translation> translationGroup;
         public ComponentDataFromEntity<PlayerComponent> playerGroup;
@@ -38,8 +40,22 @@ public class CollisionSystem : JobComponentSystem
                 ecb.DestroyEntity(triggerEvent.EntityB);
             }
 
-            //Asteroid <=> Player
-            else if (asteroidGroup.HasComponent(triggerEvent.EntityA) && playerGroup.HasComponent(triggerEvent.EntityB))
+            //Alien <=> Bullet
+            else if (alienGroup.HasComponent(triggerEvent.EntityA) && bulletGroup.HasComponent(triggerEvent.EntityB))
+            {
+                //Instantiate particle system
+                Entity spawnedEntity = ecb.Instantiate(alienGroup[triggerEvent.EntityA].ParticleSystem);
+
+                //Position particle system
+                ecb.SetComponent(spawnedEntity, translationGroup[triggerEvent.EntityA]);
+
+                //Destroy asteroid and bullet
+                ecb.DestroyEntity(triggerEvent.EntityA);
+                ecb.DestroyEntity(triggerEvent.EntityB);
+            }
+
+            //Asteroid || Alien || AlienBullet <=> Player
+            else if (killPlayerGroup.HasComponent(triggerEvent.EntityA) && playerGroup.HasComponent(triggerEvent.EntityB))
             {
                 //Instantiate particle system
                 Entity spawnedEntity = ecb.Instantiate(playerGroup[triggerEvent.EntityB].ParticleSystem);
@@ -49,6 +65,19 @@ public class CollisionSystem : JobComponentSystem
 
                 //Destroy player
                 ecb.DestroyEntity(triggerEvent.EntityB);
+            }
+
+            //Player <=> Asteroid || Alien || AlienBullet
+            else if (playerGroup.HasComponent(triggerEvent.EntityA) && killPlayerGroup.HasComponent(triggerEvent.EntityB))
+            {
+                //Instantiate particle system
+                Entity spawnedEntity = ecb.Instantiate(playerGroup[triggerEvent.EntityA].ParticleSystem);
+
+                //Position particle system
+                ecb.SetComponent(spawnedEntity, translationGroup[triggerEvent.EntityA]);
+
+                //Destroy player
+                ecb.DestroyEntity(triggerEvent.EntityA);
             }
 
         }
@@ -67,6 +96,8 @@ public class CollisionSystem : JobComponentSystem
         {
             //Pass data to collisionJob
             asteroidGroup = GetComponentDataFromEntity<AsteroidComponent>(),
+            alienGroup = GetComponentDataFromEntity<AlienComponent>(),
+            killPlayerGroup = GetComponentDataFromEntity<KillPlayerComponent>(),
             bulletGroup = GetComponentDataFromEntity<BulletComponent>(),
             translationGroup = GetComponentDataFromEntity<Translation>(),
             playerGroup = GetComponentDataFromEntity<PlayerComponent>(),
