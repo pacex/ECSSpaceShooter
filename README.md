@@ -1,5 +1,5 @@
 # ECSSpaceShooter
-A space shooter made with Unity using ECS
+[Finished] A space shooter made with Unity using ECS
 
 Shoot asteroids and aliens without getting hit by them!
 
